@@ -1,0 +1,47 @@
+services:
+  redis:
+    container_name : redis_container
+    image: "redislabs/redismod"
+    ports:
+      - "6379:6379"
+    restart: on-failure
+
+  webserver1:
+    container_name : webserver1_container
+    build: 
+      context: ./web
+      dockerfile: Dockerfile
+    # hostname gives a container its internal machine name inside the Docker network.
+    # Without hostname Docker automatically assigns a random hostname:
+    hostname: web1
+    ports:
+      - "81:5000"
+    
+    restart: on-failure
+  
+  webserver2:
+    container_name : webserver2_container
+    build: 
+      context: ./web
+      dockerfile: Dockerfile
+    # hostname gives a container its internal machine name inside the Docker network.
+    # Without hostname Docker automatically assigns a random hostname
+    hostname: web2
+    ports:
+      - "82:5000"
+    restart: on-failure
+
+  nginx:
+    container_name : nginx_container
+    build: 
+      context: ./nginx
+      dockerfile: Dockerfile
+    
+    ports:
+      - "80:80"
+    
+    restart: on-failure
+    
+    depends_on:
+      - webserver1
+      - webserver2
